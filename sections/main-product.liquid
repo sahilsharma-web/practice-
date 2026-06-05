@@ -772,9 +772,9 @@
     form.addEventListener(
       'submit',
       function (event) {
-        alert('clicked')
         var checkedBundleProducts = document.querySelectorAll('.bundle-product-checkbox:checked');
         if (!checkedBundleProducts.length) return;
+        alert('bb');
         event.preventDefault();
         event.stopImmediatePropagation();
         var formData = new FormData(form);
