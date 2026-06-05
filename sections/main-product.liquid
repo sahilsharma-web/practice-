@@ -734,9 +734,7 @@
   document.addEventListener('DOMContentLoaded', function () {
   var form = document.querySelector('[data-type="add-to-cart-form"]');
   if (!form) return;
-  form.addEventListener(
-    'submit',
-    function (event) {
+  form.addEventListener('submit',function (event) {
       var checkedBundleProducts = document.querySelectorAll('.bundle-product-checkbox:checked');
       if (!checkedBundleProducts.length) return;
       event.preventDefault();
@@ -760,9 +758,9 @@
         }
       });
 
-      if (formData.get('selling_plan')) {
-        items[0].selling_plan = formData.get('selling_plan');
-      }
+     // if (formData.get('selling_plan')) {
+      //  items[0].selling_plan = formData.get('selling_plan');
+     // } 
 
       checkedBundleProducts.forEach(function (checkbox) {
         items.push({
@@ -774,16 +772,12 @@
           },
         });
       });
-
-      for (const item of items) {
-        console.log(item);
-      }
-
       var body = { items: items };
       if (cart && typeof cart.getSectionsToRender === 'function') {
         body.sections = cart.getSectionsToRender().map(function (section) {
           return section.id;
         });
+        console.log('body section' + body.sections);
         body.sections_url = window.location.pathname;
       }
 
