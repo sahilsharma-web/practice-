@@ -123,7 +123,7 @@
                         {%- continue -%}
                       {%- endif -%} {% endcomment %}
                        {{  item.properties._bundle_id  }}
-                       {%- if item.properties._hidden == 'true' -%}true {% else %} false{%- endif -%}
+                       {%- if item.properties._bundle_hidden == 'true' -%}true {% else %} false{%- endif -%}
                       <tr
                         id="CartDrawer-Item-{{ item.index | plus: 1 }}"
                         class="cart-item"
