@@ -732,97 +732,109 @@
 </section>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    var form = document.querySelector('[data-type="add-to-cart-form"]');
-    if (!form) return;
-    form.addEventListener(
-      'submit',
-      function (event) {
-        var checkedBundleProducts = document.querySelectorAll('.bundle-product-checkbox:checked');
-        if (!checkedBundleProducts.length) return;
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        var formData = new FormData(form);
-        var mainProperties = {};
-        var cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
-        var submitButton = form.querySelector('[type="submit"]');
-        var items = [
-          {
-            id: Number(formData.get('id')),
-            quantity: Number(formData.get('quantity') || 1),
-            properties: mainProperties,
-          },
-        ];
+  var form = document.querySelector('[data-type="add-to-cart-form"]');
+  if (!form) return;
+  form.addEventListener(
+    'submit',
+    function (event) {
+      var checkedBundleProducts = document.querySelectorAll('.bundle-product-checkbox:checked');
+      if (!checkedBundleProducts.length) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      var formData = new FormData(form);
+      var mainProperties = {};
+      var cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
+      var submitButton = form.querySelector('[type="submit"]');
+      var items = [
+        {
+          id: Number(formData.get('id')),
+          quantity: Number(formData.get('quantity') || 1),
+          properties: mainProperties,
+        },
+      ];
 
-        formData.forEach(function (value, key) {
-          var propertyMatch = key.match(/^properties\[(.+)\]$/);
-          if (propertyMatch && value !== '') {
-            mainProperties[propertyMatch[1]] = value;
+      formData.forEach(function (value, key) {
+        var propertyMatch = key.match(/^properties\[(.+)\]$/);
+        if (propertyMatch && value !== '') {
+          mainProperties[propertyMatch[1]] = value;
+        }
+      });
+
+      if (formData.get('selling_plan')) {
+        items[0].selling_plan = formData.get('selling_plan');
+      }
+
+      checkedBundleProducts.forEach(function (checkbox) {
+        items.push({
+          id: Number(checkbox.value),
+          quantity: 1,
+          properties: {
+            _bundle_id: checkbox.dataset.bundleId,
+            _bundle_hidden: 'true',
+          },
+        });
+      });
+
+      for (const item of items) {
+        console.log(item);
+      }
+
+      var body = { items: items };
+      if (cart && typeof cart.getSectionsToRender === 'function') {
+        body.sections = cart.getSectionsToRender().map(function (section) {
+          return section.id;
+        });
+        body.sections_url = window.location.pathname;
+      }
+
+      if (submitButton) {
+        submitButton.setAttribute('aria-disabled', true);
+        submitButton.classList.add('loading');
+      }
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (response) {
+          if (response.status) {
+            window.location.href = '/cart';
+            return;
+          }
+
+          if (cart && typeof cart.renderContents === 'function') {
+            cart.renderContents(response);
+
+            // ✅ Cart drawer/notification open karo
+            if (typeof cart.open === 'function') {
+              cart.open();
+            } else {
+              // Fallback: custom event dispatch (works in most Shopify themes)
+              document.documentElement.dispatchEvent(
+                new CustomEvent('cart:open', { bubbles: true })
+              );
+            }
+          } else {
+            window.location.href = '/cart';
+          }
+        })
+        .catch(function () {
+          window.location.href = '/cart';
+        })
+        .finally(function () {
+          if (submitButton) {
+            submitButton.removeAttribute('aria-disabled');
+            submitButton.classList.remove('loading');
           }
         });
-
-        if (formData.get('selling_plan')) {
-          items[0].selling_plan = formData.get('selling_plan');
-        }
-
-        checkedBundleProducts.forEach(function (checkbox) {
-          items.push({
-            id: Number(checkbox.value),
-            quantity: 1,
-            properties: {
-              _bundle_id: checkbox.dataset.bundleId,
-              _bundle_hidden: 'true',
-            },
-          });
-        });
-        for (const item of items) {
-          console.log(item);
-        }
-        var body = { items: items };
-        if (cart && typeof cart.getSectionsToRender === 'function') {
-          body.sections = cart.getSectionsToRender().map(function (section) {
-            return section.id;
-          });
-          body.sections_url = window.location.pathname;
-        }
-
-        if (submitButton) {
-          submitButton.setAttribute('aria-disabled', true);
-          submitButton.classList.add('loading');
-        }
-
-        fetch('/cart/add.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        })
-          .then(function (response) {
-            return response.json();
-          })
-          .then(function (response) {
-            if (response.status) {
-              window.location.href = '/cart';
-              return;
-            }
-
-            if (cart && typeof cart.renderContents === 'function') {
-              cart.renderContents(response);
-            } else {
-              window.location.href = '/cart';
-            }
-          })
-          .catch(function () {
-            window.location.href = '/cart';
-          })
-          .finally(function () {
-            if (submitButton) {
-              submitButton.removeAttribute('aria-disabled');
-              submitButton.classList.remove('loading');
-            }
-          });
-      },
-      true
-    );
-  });
+    },
+    true
+  );
+});
 </script>
 {% schema %}
 {
