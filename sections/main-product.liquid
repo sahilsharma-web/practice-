@@ -208,7 +208,7 @@
                     form="product-form-{{ section.id }}"
                   >
                   {% for product in block.settings.bundle_products_list %}
-                    <input
+                    {% comment %} <input
                       type="checkbox"
                       id="bundle-product-{{ block.id }}-{{ forloop.index }}"
                       class="bundle-product-checkbox"
@@ -217,7 +217,7 @@
                       {% unless product.selected_or_first_available_variant.available %}
                         disabled
                       {% endunless %}
-                    >
+                    > {% endcomment %}
                       {% comment %}
                       Old no-extra-JS attempt preserved for reference:
                       {% endcomment %}
