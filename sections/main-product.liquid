@@ -208,15 +208,6 @@
                     form="product-form-{{ section.id }}"
                   >
                   {% for product in block.settings.bundle_products_list %}
-                    {% comment %}
-                      Old checkbox code preserved for reference:
-                      <input
-                        type="checkbox"
-                        id="show_product_image"
-                        name="show_product_image"
-                        value="{{ product.selected_or_first_available_variant.id }}"
-                      >
-                    {% endcomment %}
                     <input
                       type="checkbox"
                       id="bundle-product-{{ block.id }}-{{ forloop.index }}"
@@ -227,8 +218,9 @@
                         disabled
                       {% endunless %}
                     >
-                    {% comment %}
+                      {% comment %}
                       Old no-extra-JS attempt preserved for reference:
+                      {% endcomment %}
                       <input
                         type="checkbox"
                         id="bundle-product-{{ block.id }}-{{ forloop.index }}"
@@ -236,7 +228,6 @@
                         value="{{ product.selected_or_first_available_variant.id }}"
                         form="product-form-{{ section.id }}"
                       >
-                    {% endcomment %}
                     {% comment %}
                       Hidden quantity/properties inputs remain commented.
                       Bundle item properties are now added only for checked products in JS.
