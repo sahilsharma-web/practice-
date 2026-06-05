@@ -122,15 +122,15 @@
                       {%- if is_duplicate -%}
                         {%- continue -%}
                       {%- endif -%} {% endcomment %}
-                       {{  item.properties._bundle_id  }}
-                       {{ item.properties._bundle_hidden }}
+                       
+                       
                        {% comment %} {%- if item.properties._bundle_hidden == 'true' -%}true {%- endif -%} {% endcomment %}
                       <tr
                         id="CartDrawer-Item-{{ item.index | plus: 1 }}"
                         class="cart-item"
 
                         role="row"
-                        data-product-stamp="{{ item.properties['_bundle_id'] }}"
+                        data-product-stamp="{{  item.properties._bundle_id  }}"
                         data-hidden-property=" {%- if item.properties._bundle_hidden == 'true' -%}true{%- endif -%}"
                       >
                         <td
