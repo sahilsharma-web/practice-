@@ -122,6 +122,7 @@
                       {%- if is_duplicate -%}
                         {%- continue -%}
                       {%- endif -%} {% endcomment %}
+                       {{  item.properties._bundle_id  }}
                       <tr
                         id="CartDrawer-Item-{{ item.index | plus: 1 }}"
                         class="cart-item"
