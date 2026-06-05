@@ -772,6 +772,7 @@
     form.addEventListener(
       'submit',
       function (event) {
+        alert('clicked')
         var checkedBundleProducts = document.querySelectorAll('.bundle-product-checkbox:checked');
         if (!checkedBundleProducts.length) return;
         event.preventDefault();
@@ -810,7 +811,7 @@
           });
         });
 
-        console.log('items' + items);
+        alert('items' + items);
         return false;
         var body = { items: items };
         if (cart && typeof cart.getSectionsToRender === 'function') {
