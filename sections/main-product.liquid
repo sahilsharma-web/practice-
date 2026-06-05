@@ -728,48 +728,11 @@
   <script src="{{ 'selling-plans.js' | asset_url }}" defer="defer"></script>
   {% comment %}<script src="{{ 'selling-plan-docs.js' | asset_url }}" defer="defer"></script>{% endcomment %}
 </section>
-{% comment %}
-  Bundle change:
-  Old custom JS preserved but disabled.
-  It was adding checked bundle products in a second /cart/add.js request after the main product,
-  so the cart drawer showed only the main product until page refresh.
-{% endcomment %}
-{% comment %}
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var form = document.querySelector('[data-type="add-to-cart-form"]');
-      form.addEventListener('submit', function () {
-        var bundleId = document.querySelector('[name="properties[_bundle_id]"]').value;
-        var checkedProducts = [];
-        document.querySelectorAll('input[type="checkbox"]:checked').forEach(function (checkbox) {
-          checkedProducts.push({
-            id: checkbox.value,
-            quantity: 1,
-            properties: {
-              _hidden: 'true',
-              _bundle_id: bundleId,
-            },
-          });
-        });
-        if (checkedProducts.length > 0) {
-          console.log('more then one ');
-          fetch('/cart/add.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items: checkedProducts }),
-          });
-        }
-      });
-    });
-  </script>
-{% endcomment %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var form = document.querySelector('[data-type="add-to-cart-form"]');
     if (!form) return;
-    form.addEventListener(
-      'submit',
-      function (event) {
+    form.addEventListener('submit',function (event) {
         var checkedBundleProducts = document.querySelectorAll('.bundle-product-checkbox:checked');
         if (!checkedBundleProducts.length) return;
         event.preventDefault();
@@ -808,7 +771,7 @@
           });
         });
 
-        alert('items' + items);
+        console.log('items' + items);
         return false;
         var body = { items: items };
         if (cart && typeof cart.getSectionsToRender === 'function') {
