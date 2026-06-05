@@ -208,7 +208,6 @@
                     form="product-form-{{ section.id }}"
                   >
                   {% for product in block.settings.bundle_products_list %}
-                    {% comment %}
                       <input
                         type="checkbox"
                         id="bundle-product-{{ block.id }}-{{ forloop.index }}"
@@ -219,17 +218,16 @@
                           disabled
                         {% endunless %}
                       >
-                    {% endcomment %}
                     {% comment %}
                       Old no-extra-JS attempt preserved for reference:
                     {% endcomment %}
-                    <input
+                    {% comment %} <input
                       type="checkbox"
                       id="bundle-product-{{ block.id }}-{{ forloop.index }}"
                       name="items[][id]"
                       value="{{ product.selected_or_first_available_variant.id }}"
                       form="product-form-{{ section.id }}"
-                    >
+                    > {% endcomment %}
                     {% comment %}
                       Hidden quantity/properties inputs remain commented.
                       Bundle item properties are now added only for checked products in JS.
@@ -774,7 +772,6 @@
       function (event) {
         var checkedBundleProducts = document.querySelectorAll('.bundle-product-checkbox:checked');
         if (!checkedBundleProducts.length) return;
-        alert('bb');
         event.preventDefault();
         event.stopImmediatePropagation();
         var formData = new FormData(form);
