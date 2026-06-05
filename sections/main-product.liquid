@@ -208,26 +208,28 @@
                     form="product-form-{{ section.id }}"
                   >
                   {% for product in block.settings.bundle_products_list %}
-                      <input
-                        type="checkbox"
-                        id="bundle-product-{{ block.id }}-{{ forloop.index }}"
-                        class="bundle-product-checkbox"
-                        value="{{ product.selected_or_first_available_variant.id }}"
-                        data-bundle-id="{{ bundle_id }}"
-                        {% unless product.selected_or_first_available_variant.available %}
-                          disabled
-                        {% endunless %}
-                      >
+                    <input
+                      type="checkbox"
+                      id="bundle-product-{{ block.id }}-{{ forloop.index }}"
+                      class="bundle-product-checkbox"
+                      value="{{ product.selected_or_first_available_variant.id }}"
+                      data-bundle-id="{{ bundle_id }}"
+                      {% unless product.selected_or_first_available_variant.available %}
+                        disabled
+                      {% endunless %}
+                    >
                     {% comment %}
                       Old no-extra-JS attempt preserved for reference:
                     {% endcomment %}
-                    {% comment %} <input
-                      type="checkbox"
-                      id="bundle-product-{{ block.id }}-{{ forloop.index }}"
-                      name="items[][id]"
-                      value="{{ product.selected_or_first_available_variant.id }}"
-                      form="product-form-{{ section.id }}"
-                    > {% endcomment %}
+                    {% comment %}
+                      <input
+                        type="checkbox"
+                        id="bundle-product-{{ block.id }}-{{ forloop.index }}"
+                        name="items[][id]"
+                        value="{{ product.selected_or_first_available_variant.id }}"
+                        form="product-form-{{ section.id }}"
+                      >
+                    {% endcomment %}
                     {% comment %}
                       Hidden quantity/properties inputs remain commented.
                       Bundle item properties are now added only for checked products in JS.
@@ -732,7 +734,9 @@
   document.addEventListener('DOMContentLoaded', function () {
     var form = document.querySelector('[data-type="add-to-cart-form"]');
     if (!form) return;
-    form.addEventListener('submit',function (event) {
+    form.addEventListener(
+      'submit',
+      function (event) {
         var checkedBundleProducts = document.querySelectorAll('.bundle-product-checkbox:checked');
         if (!checkedBundleProducts.length) return;
         event.preventDefault();
@@ -770,9 +774,9 @@
             },
           });
         });
-
-        console.log('items' + items);
-        return false;
+        for (const item of items) {
+          console.log(item);
+        }
         var body = { items: items };
         if (cart && typeof cart.getSectionsToRender === 'function') {
           body.sections = cart.getSectionsToRender().map(function (section) {
