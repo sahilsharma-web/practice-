@@ -216,8 +216,9 @@
                       data-bundle-id="{{ bundle_id }}"
                       {% unless product.selected_or_first_available_variant.available %}
                         disabled
-                      {% endunless %} {% endcomment %}
+                      {% endunless %} 
                     >
+                      {% endcomment %}
                     {% comment %}
                       Old no-extra-JS attempt preserved for reference:
                     {% endcomment %}
