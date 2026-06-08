@@ -758,9 +758,6 @@
         }
       });
 
-     // if (formData.get('selling_plan')) {
-      //  items[0].selling_plan = formData.get('selling_plan');
-     // } 
 
       checkedBundleProducts.forEach(function (checkbox) {
         items.push({
@@ -803,11 +800,9 @@
           if (cart && typeof cart.renderContents === 'function') {
             cart.renderContents(response);
 
-            // ✅ Cart drawer/notification open karo
             if (typeof cart.open === 'function') {
               cart.open();
             } else {
-              // Fallback: custom event dispatch (works in most Shopify themes)
               document.documentElement.dispatchEvent(
                 new CustomEvent('cart:open', { bubbles: true })
               );
