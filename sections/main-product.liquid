@@ -208,13 +208,13 @@
                     form="product-form-{{ section.id }}"
                   >
                   {% for product in block.settings.bundle_products_list %}
-                      <input
-                        type="checkbox"
-                        id="bundle-product-{{ block.id }}-{{ forloop.index }}"
-                        name="items[][id]"
-                        value="{{ product.selected_or_first_available_variant.id }}"
-                        form="product-form-{{ section.id }}"
-                      >
+                    <input
+                      type="checkbox"
+                      class="bundle-product-checkbox"
+                      id="bundle-product-{{ block.id }}-{{ forloop.index }}"
+                      value="{{ product.selected_or_first_available_variant.id }}"
+                      data-bundle-id="{{ bundle_id }}"
+                    >
                     <img
                       src="{{ product.featured_image | image_url: width: 500 }}"
                       alt="{{ product.title }}"
@@ -680,98 +680,97 @@
 </section>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-  var form = document.querySelector('[data-type="add-to-cart-form"]');
-  if (!form) return;
-  form.addEventListener('submit',function (event) {
-      var checkedBundleProducts = document.querySelectorAll('.bundle-product-checkbox:checked');
-      if (!checkedBundleProducts.length) return;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      var formData = new FormData(form);
-      var mainProperties = {};
-      var cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
-      var submitButton = form.querySelector('[type="submit"]');
-      var items = [
-        {
-          id: Number(formData.get('id')),
-          quantity: Number(formData.get('quantity') || 1),
-          properties: mainProperties,
-        },
-      ];
-
-      formData.forEach(function (value, key) {
-        var propertyMatch = key.match(/^properties\[(.+)\]$/);
-        if (propertyMatch && value !== '') {
-          mainProperties[propertyMatch[1]] = value;
-        }
-      });
-
-
-      checkedBundleProducts.forEach(function (checkbox) {
-        items.push({
-          id: Number(checkbox.value),
-          quantity: 1,
-          properties: {
-            _bundle_id: checkbox.dataset.bundleId,
-            _bundle_hidden: 'true',
+    var form = document.querySelector('[data-type="add-to-cart-form"]');
+    if (!form) return;
+    form.addEventListener(
+      'submit',
+      function (event) {
+        var checkedBundleProducts = document.querySelectorAll('.bundle-product-checkbox:checked');
+        if (!checkedBundleProducts.length) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        var formData = new FormData(form);
+        var mainProperties = {};
+        var cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
+        var submitButton = form.querySelector('[type="submit"]');
+        var items = [
+          {
+            id: Number(formData.get('id')),
+            quantity: Number(formData.get('quantity') || 1),
+            properties: mainProperties,
           },
-        });
-      });
-      var body = { items: items };
-      if (cart && typeof cart.getSectionsToRender === 'function') {
-        body.sections = cart.getSectionsToRender().map(function (section) {
-          return section.id;
-        });
-        console.log('body section' + body.sections);
-        body.sections_url = window.location.pathname;
-      }
+        ];
 
-      if (submitButton) {
-        submitButton.setAttribute('aria-disabled', true);
-        submitButton.classList.add('loading');
-      }
-
-      fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (response) {
-          if (response.status) {
-            window.location.href = '/cart';
-            return;
+        formData.forEach(function (value, key) {
+          var propertyMatch = key.match(/^properties\[(.+)\]$/);
+          if (propertyMatch && value !== '') {
+            mainProperties[propertyMatch[1]] = value;
           }
+        });
 
-          if (cart && typeof cart.renderContents === 'function') {
-            cart.renderContents(response);
+        checkedBundleProducts.forEach(function (checkbox) {
+          items.push({
+            id: Number(checkbox.value),
+            quantity: 1,
+            properties: {
+              _bundle_id: checkbox.dataset.bundleId,
+              _bundle_hidden: 'true',
+            },
+          });
+        });
+        var body = { items: items };
+        if (cart && typeof cart.getSectionsToRender === 'function') {
+          body.sections = cart.getSectionsToRender().map(function (section) {
+            return section.id;
+          });
+          console.log('body section' + body.sections);
+          body.sections_url = window.location.pathname;
+        }
 
-            if (typeof cart.open === 'function') {
-              cart.open();
-            } else {
-              document.documentElement.dispatchEvent(
-                new CustomEvent('cart:open', { bubbles: true })
-              );
+        if (submitButton) {
+          submitButton.setAttribute('aria-disabled', true);
+          submitButton.classList.add('loading');
+        }
+
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (response) {
+            if (response.status) {
+              window.location.href = '/cart';
+              return;
             }
-          } else {
+
+            if (cart && typeof cart.renderContents === 'function') {
+              cart.renderContents(response);
+
+              if (typeof cart.open === 'function') {
+                cart.open();
+              } else {
+                document.documentElement.dispatchEvent(new CustomEvent('cart:open', { bubbles: true }));
+              }
+            } else {
+              window.location.href = '/cart';
+            }
+          })
+          .catch(function () {
             window.location.href = '/cart';
-          }
-        })
-        .catch(function () {
-          window.location.href = '/cart';
-        })
-        .finally(function () {
-          if (submitButton) {
-            submitButton.removeAttribute('aria-disabled');
-            submitButton.classList.remove('loading');
-          }
-        });
-    },
-    true
-  );
-});
+          })
+          .finally(function () {
+            if (submitButton) {
+              submitButton.removeAttribute('aria-disabled');
+              submitButton.classList.remove('loading');
+            }
+          });
+      },
+      true
+    );
+  });
 </script>
 {% schema %}
 {
