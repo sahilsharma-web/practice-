@@ -208,13 +208,59 @@
                     form="product-form-{{ section.id }}"
                   >
                   {% for product in block.settings.bundle_products_list %}
+                    {% comment %}
+                      Old checkbox code preserved for reference:
+                      <input
+                        type="checkbox"
+                        id="show_product_image"
+                        name="show_product_image"
+                        value="{{ product.selected_or_first_available_variant.id }}"
+                      >
+                    {% endcomment %}
                     <input
                       type="checkbox"
-                      class="bundle-product-checkbox"
                       id="bundle-product-{{ block.id }}-{{ forloop.index }}"
+                      class="bundle-product-checkbox"
                       value="{{ product.selected_or_first_available_variant.id }}"
                       data-bundle-id="{{ bundle_id }}"
+                      {% unless product.selected_or_first_available_variant.available %}
+                        disabled
+                      {% endunless %}
                     >
+                    {% comment %}
+                      Old no-extra-JS attempt preserved for reference:
+                      <input
+                        type="checkbox"
+                        id="bundle-product-{{ block.id }}-{{ forloop.index }}"
+                        name="items[][id]"
+                        value="{{ product.selected_or_first_available_variant.id }}"
+                        form="product-form-{{ section.id }}"
+                      >
+                    {% endcomment %}
+                    {% comment %}
+                      Hidden quantity/properties inputs remain commented.
+                      Bundle item properties are now added only for checked products in JS.
+                    {% endcomment %}
+                    {% comment %}
+                      <input
+                        type="hidden"
+                        name="items[{{ forloop.index }}][quantity]"
+                        value="1"
+                        form="product-form-{{ section.id }}"
+                      >
+                      <input
+                        type="hidden"
+                        name="items[{{ forloop.index }}][properties][_hidden]"
+                        value="true"
+                        form="product-form-{{ section.id }}"
+                      >
+                      <input
+                        type="hidden"
+                        name="items[{{ forloop.index }}][properties][_bundle_id]"
+                        value="{{ bundle_id }}"
+                        form="product-form-{{ section.id }}"
+                      >
+                    {% endcomment %}
                     <img
                       src="{{ product.featured_image | image_url: width: 500 }}"
                       alt="{{ product.title }}"
@@ -223,6 +269,19 @@
                     >
                     <span>{{ product.title }}</span>
                   {% endfor %}
+                  {% comment %}
+                    Old bundle property input preserved for reference.
+                    Main product now uses the active hidden _bundle_id input above.
+                    Bundle item properties are added only for selected checkboxes in JS.
+                  {% endcomment %}
+                  {% comment %}
+                    <input
+                      type="hidden"
+                      name="properties[_bundle_id]"
+                      value="bundle-{{ product.id }}-{{ 'now' | date: '%s' }}"
+                      form="product-form-{{ section.id }}"
+                    >
+                  {% endcomment %}
                 </div>
               </div>
             {%- when 'custom_liquid' -%}
@@ -678,6 +737,41 @@
   <script src="{{ 'selling-plans.js' | asset_url }}" defer="defer"></script>
   {% comment %}<script src="{{ 'selling-plan-docs.js' | asset_url }}" defer="defer"></script>{% endcomment %}
 </section>
+{% comment %}
+  Bundle change:
+  Old custom JS preserved but disabled.
+  It was adding checked bundle products in a second /cart/add.js request after the main product,
+  so the cart drawer showed only the main product until page refresh.
+{% endcomment %}
+{% comment %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var form = document.querySelector('[data-type="add-to-cart-form"]');
+      form.addEventListener('submit', function () {
+        var bundleId = document.querySelector('[name="properties[_bundle_id]"]').value;
+        var checkedProducts = [];
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach(function (checkbox) {
+          checkedProducts.push({
+            id: checkbox.value,
+            quantity: 1,
+            properties: {
+              _hidden: 'true',
+              _bundle_id: bundleId,
+            },
+          });
+        });
+        if (checkedProducts.length > 0) {
+          console.log('more then one ');
+          fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: checkedProducts }),
+          });
+        }
+      });
+    });
+  </script>
+{% endcomment %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var form = document.querySelector('[data-type="add-to-cart-form"]');
@@ -708,6 +802,10 @@
           }
         });
 
+        if (formData.get('selling_plan')) {
+          items[0].selling_plan = formData.get('selling_plan');
+        }
+
         checkedBundleProducts.forEach(function (checkbox) {
           items.push({
             id: Number(checkbox.value),
@@ -718,12 +816,13 @@
             },
           });
         });
+
         var body = { items: items };
+
         if (cart && typeof cart.getSectionsToRender === 'function') {
           body.sections = cart.getSectionsToRender().map(function (section) {
             return section.id;
           });
-          console.log('body section' + body.sections);
           body.sections_url = window.location.pathname;
         }
 
@@ -738,25 +837,22 @@
           body: JSON.stringify(body),
         })
           .then(function (response) {
-           /* if (response.status) {
+            return response.json();
+          })
+          .then(function (response) {
+            if (response.status) {
               window.location.href = '/cart';
               return;
-            }*/
+            }
 
             if (cart && typeof cart.renderContents === 'function') {
               cart.renderContents(response);
-
-              // Small delay to let DOM update before opening
-              setTimeout(function () {
-                if (typeof cart.open === 'function') {
-                  cart.open();
-                } else {
-                  document.documentElement.dispatchEvent(new CustomEvent('cart:open', { bubbles: true }));
-                }
-              }, 300);
             } else {
               window.location.href = '/cart';
             }
+          })
+          .catch(function () {
+            window.location.href = '/cart';
           })
           .finally(function () {
             if (submitButton) {
