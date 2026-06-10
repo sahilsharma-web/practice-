@@ -222,6 +222,7 @@
                         value="1"
                         form="product-form-{{ section.id }}"
                       >
+                        {% endcomment %}
                       <input
                         type="hidden"
                         name="items[{{ forloop.index }}][properties][_hidden]"
@@ -234,7 +235,7 @@
                         value="{{ bundle_id }}"
                         form="product-form-{{ section.id }}"
                       >
-                    {% endcomment %}
+                    
                     <img
                       src="{{ product.featured_image | image_url: width: 500 }}"
                       alt="{{ product.title }}"
