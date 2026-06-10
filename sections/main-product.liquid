@@ -222,7 +222,7 @@
                         value="1"
                         form="product-form-{{ section.id }}"
                       >
-                        {% endcomment %}
+                      {% endcomment %}
                       <input
                         type="hidden"
                         name="items[{{ forloop.index }}][properties][_hidden]"
@@ -235,7 +235,6 @@
                         value="{{ bundle_id }}"
                         form="product-form-{{ section.id }}"
                       >
-                    
                     <img
                       src="{{ product.featured_image | image_url: width: 500 }}"
                       alt="{{ product.title }}"
@@ -243,7 +242,7 @@
                       height="50"
                     >
                       <a href="{{ product.url }}" class="bundle-product-title">{{ product.title }}</a>
-                    {% comment %} <span>{{ product.title }}</span> {% endcomment %}
+                    <span>{{ product.title }}</span>
                   {% endfor %}
                 </div>
               </div>
@@ -701,7 +700,7 @@
   {% comment %}<script src="{{ 'selling-plan-docs.js' | asset_url }}" defer="defer"></script>{% endcomment %}
 </section>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  {% comment %} document.addEventListener('DOMContentLoaded', function () {
     var form = document.querySelector('[data-type="add-to-cart-form"]');
     if (!form) return;
     form.addEventListener(
@@ -791,7 +790,7 @@
       },
       true
     );
-  });
+  }); {% endcomment %}
 </script>
 {% schema %}
 {
