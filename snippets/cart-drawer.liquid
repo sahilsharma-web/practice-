@@ -122,23 +122,20 @@
                       {%- if is_duplicate -%}
                         {%- continue -%}
                       {%- endif -%} {% endcomment %}
-                       
-                       
-                       {% comment %} {%- if item.properties._bundle_hidden == 'true' -%}true {%- endif -%} {% endcomment %}
                       <tr
                         id="CartDrawer-Item-{{ item.index | plus: 1 }}"
                         class="cart-item"
 
                         role="row"
-                        data-product-stamp="{{  item.properties._bundle_id  }}"
-                        data-hidden-property=" {%- if item.properties._bundle_hidden == 'true' -%}true{%- endif -%}"
+                        data-product-stamp="{{ item.properties['_bundle_id'] }}"
+                        data-hidden-property=" {%- if item.properties._hidden == 'true' -%}true{%- endif -%}"
                       >
                         <td
                           class="cart-item__media"
                           role="cell"
                           headers="CartDrawer-ColumnProductImage"
                           data-product-stamp="{{ item.properties['_bundle_id'] }}"
-                          data-hidden-property="{{ item.properties._bundle_hidden }}"
+                          data-hidden-property="{{ item.properties._hidden }}"
                         >
                           {% if item.image %}
                             {% comment %} Leave empty space due to a:empty CSS display: none rule {% endcomment %}
