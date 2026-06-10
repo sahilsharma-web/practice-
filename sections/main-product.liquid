@@ -241,7 +241,8 @@
                       width="50"
                       height="50"
                     >
-                    <span>{{ product.title }}</span>
+                      <a href="{{ product.url }}" class="bundle-product-title">{{ product.title }}</a>
+                    {% comment %} <span>{{ product.title }}</span> {% endcomment %}
                   {% endfor %}
                 </div>
               </div>
