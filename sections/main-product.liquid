@@ -225,13 +225,13 @@
                         {% endcomment %}
                       <input
                         type="hidden"
-                        name="items[{{ forloop.index0 }}][properties][_hidden]"
+                        name="items[{{ forloop.index }}][properties][_hidden]"
                         value="true"
                         form="product-form-{{ section.id }}"
                       >
                       <input
                         type="hidden"
-                        name="items[{{ forloop.index0 }}][properties][_bundle_id]"
+                        name="items[{{ forloop.index }}][properties][_bundle_id]"
                         value="{{ bundle_id }}"
                         form="product-form-{{ section.id }}"
                       >
